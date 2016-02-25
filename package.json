@@ -1,12 +1,11 @@
 {
   "name": "redux-simple-actions",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "redux simple actions",
   "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src --out-dir lib",
-    "lint": "eslint --ext .js,.jsx ."
+    "prepublish": "make clean build",
+    "lint": "make lint"
   },
   "repository": {
     "type": "git",

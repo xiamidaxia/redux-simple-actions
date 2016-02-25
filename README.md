@@ -4,7 +4,7 @@
 
 ## API
 
-- createActions
+### createActions
 
 ```javascript
 import {createActions} from 'redux-simple-actions';
@@ -29,7 +29,7 @@ createActions('prefix', ['loading', 'loaded'], {
 });
 ```
 
-- handleActions
+### handleActions
 
 ```javascript
 import {handleActions} from 'redux-simple-actions';
@@ -51,7 +51,7 @@ handleActions('prefix', {
 }, initialState);
 ```
 
-- connect
+### connect
 
 ```javascript
 import { connect } from 'redux-simple-actions';
