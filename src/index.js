@@ -77,7 +77,6 @@ export function handleActions(prefix, actions, initialState) {
   if (typeof prefix !== 'string') throw new Error('handleActions need a store name!');
   const reducers = {};
   mapValues(actions, (action, key) => {
-    // support reducer context
     const reducerWrap = function (state, _act) {
       // todo: Reject error to reducer
       if (_act && _act.error) return state;
