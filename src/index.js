@@ -1,7 +1,6 @@
 import { handleActions as reduxHandleActions } from 'redux-actions';
-// import reduceReducers from 'reduce-reducers';
 import { connect as reduxConnect } from 'react-redux';
-import { mapValues } from '../utils';
+import { mapValues } from './utils';
 const _allActionKeys = [];
 const _allReducerKeys = [];
 const simpleFn = (...args) => args.length > 1 ? args : args[0];

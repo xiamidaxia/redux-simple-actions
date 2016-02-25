@@ -1,6 +1,6 @@
 {
   "name": "redux-simple-actions",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "redux simple actions",
   "main": "lib/index.js",
   "scripts": {
