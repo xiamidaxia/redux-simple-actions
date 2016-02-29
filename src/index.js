@@ -1,8 +1,6 @@
 import { handleActions as reduxHandleActions } from 'redux-actions';
 import { connect as reduxConnect } from 'react-redux';
 import { mapValues } from './utils';
-const _allActionKeys = [];
-const _allReducerKeys = [];
 const simpleFn = (...args) => args.length > 1 ? args : args[0];
 /**
  * redux actions creator
@@ -44,7 +42,6 @@ export function createActions(prefix, simpleActions, actions = {}) {
   });
   return mapValues(_actions, (fn, key) => {
     const type = prefix + '.' + key;
-    _allActionKeys.push(type);
     return function actionWrap(...args) {
       let payload = fn.apply(this, args);
       // paylod toPromise
@@ -75,14 +72,16 @@ export function createActions(prefix, simpleActions, actions = {}) {
 export function handleActions(prefix, actions, initialState) {
   if (typeof prefix !== 'string') throw new Error('handleActions need a store name!');
   const reducers = {};
+  const ctx = {};
   mapValues(actions, (action, key) => {
+    const type = prefix + '.' + key;
     const reducerWrap = function (state, _act) {
       // todo: Reject error to reducer
       if (_act && _act.error) return state;
-      return action.apply(this, arguments);
+      return action.apply(ctx, arguments);
     };
-    reducers[prefix + '.' + key] = reducerWrap;
-    _allReducerKeys.push(prefix + '.' + key);
+    ctx[key] = reducerWrap;
+    reducers[type] = reducerWrap;
   });
   return reduxHandleActions(reducers, initialState);
 }
@@ -154,7 +153,9 @@ export function connect(...states) {
     function mapDispatchToProps(dispatch) {
       const props = {};
       Object.keys(actions).forEach(key => {
-        const ctx = {};
+        const ctx = {
+          dispatch,
+        };
         props[key] = mapValues(actions[key], (act) => {
           if (typeof act !== 'function') return act;
           return (...args) => dispatch(act.apply(ctx, args));
@@ -167,27 +168,4 @@ export function connect(...states) {
       mapDispatchToProps
     )(Component);
   };
-}
-/**
- * check action match reducer
- */
-export function checkActionKeys() {
-  const unknownActions = [];
-  const unknownReducers = [];
-  _allActionKeys.forEach((key) => {
-    if (_allReducerKeys.indexOf(key) === -1) {
-      unknownActions.push(key);
-    }
-  });
-  _allReducerKeys.forEach((key) => {
-    if (_allActionKeys.indexOf(key) === -1) {
-      unknownReducers.push(key);
-    }
-  });
-  if (unknownActions.length !== 0) {
-    console.error('UnMatched actions: ', unknownActions.join(', '));
-  }
-  if (unknownReducers.length !== 0) {
-    console.error('UnMatched reducers: ', unknownReducers.join(', '));
-  }
 }
