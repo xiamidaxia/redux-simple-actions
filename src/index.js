@@ -1,7 +1,7 @@
 import { handleActions as reduxHandleActions } from 'redux-actions';
 import { connect as reduxConnect } from 'react-redux';
 import { mapValues } from './utils';
-const simpleFn = () => { return undefined };
+const simpleFn = (...args) => args.length > 1 ? args : args[0];
 /**
  * redux actions creator
  * @param {string} prefix
