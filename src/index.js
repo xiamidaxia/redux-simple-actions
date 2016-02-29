@@ -1,7 +1,7 @@
 import { handleActions as reduxHandleActions } from 'redux-actions';
 import { connect as reduxConnect } from 'react-redux';
 import { mapValues } from './utils';
-const simpleFn = (...args) => args.length > 1 ? args : args[0];
+const simpleFn = () => { return undefined };
 /**
  * redux actions creator
  * @param {string} prefix
@@ -43,16 +43,22 @@ export function createActions(prefix, simpleActions, actions = {}) {
   return mapValues(_actions, (fn, key) => {
     const type = prefix + '.' + key;
     return function actionWrap(...args) {
-      let payload = fn.apply(this, args);
+      const ctx = {
+        dispatch(key, ...args){
+          if (!ctx.ctx[key]) {
+            return ctx.ctx._dispatch({type : prefix + '.' + key, payload: undefined});
+          } else {
+            return ctx.ctx[key](...args);
+          }
+        },
+        ctx: this,
+      }
+      let payload = fn.apply(ctx, args);
       // paylod toPromise
       if (!payload || ! typeof payload.then === 'function') {
         payload = Promise.resolve(payload);
       }
-      const action = { type, payload};
-      if (args.length === 1 && args[0] instanceof Error) {
-        action.error = true;
-      }
-      return action;
+      return { type, payload};
     };
   });
 }
@@ -154,11 +160,13 @@ export function connect(...states) {
       const props = {};
       Object.keys(actions).forEach(key => {
         const ctx = {
-          dispatch,
+          _dispatch: dispatch,
         };
         props[key] = mapValues(actions[key], (act) => {
           if (typeof act !== 'function') return act;
-          return (...args) => dispatch(act.apply(ctx, args));
+          return (...args) => {
+            return dispatch(act.apply(ctx, args));
+          }
         }, ctx);
       });
       return props;

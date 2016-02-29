@@ -9,7 +9,11 @@
 ```javascript
 import {createActions} from 'redux-simple-actions';
 
-createActions('prefix', {
+// simple action keys
+createActions('context', ['fetchData', 'otherAction']);
+
+// or
+createActions('context', {
   fetchData(data) { 
     retrun data;
   },
@@ -18,15 +22,17 @@ createActions('prefix', {
 });
 
 // or
-createActions('prefix', ['loading', 'loaded'], {
-  async fetchData() {
-    await this.loading();
+createActions('context', {
+  async fetchData(arg1, arg2) {
+    const {dispatch, done} = this;
+    await dispatch('loading');
     const myResult = yield fetch('/ajax.json');
-    await this.loaded();
-    return myResult;
+    await dispatch('loaded');
+    done(myResult);
   },
   otherAction() {},
 });
+
 ```
 
 ### handleActions
@@ -38,7 +44,7 @@ const initialState = {
   loading: false,
   data: null,
 };
-handleActions('prefix', {
+handleActions('context', {
   fetchData(state, action) { 
     return {...state, data: action.payload};
   },
@@ -59,19 +65,19 @@ import { routeActions } from 'react-router-redux';
 import * as actions from '../actions';
 
 // add states
-@connect('prefix', 'prefix.data', 'prefix.loading') ||
+@connect('context', 'context.data', 'context.loading') ||
 
 // alias states
-@connect({prefixData: 'prefix.data') ||
+@connect({contextData: 'context.data') ||
 
 // add actions
 @connect({ actions, routeActions }) ||
 
 // add states and actions
-@connect('prefix.data', { actions, routeActions }) ||
+@connect('context.data', { actions, routeActions }) ||
 
 // alias states and actions
-@connect({prefixData: 'prefix.data' }, { actions, routeActions })
+@connect({contextData: 'context.data' }, { actions, routeActions })
 class ExampleComponent extends Component {
   render() {
     return <div></div>;
